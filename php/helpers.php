@@ -25,11 +25,27 @@ function block_field( $name, $echo = true ) {
 	 */
 	global $block_lab_attributes, $block_lab_config;
 
-	if (
-		! isset( $block_lab_attributes ) ||
-		! is_array( $block_lab_attributes ) ||
-		( ! isset( $block_lab_config->fields[ $name ] ) && 'className' !== $name )
-	) {
+	$is_name_allowed = (
+		isset( $block_lab_attributes )
+		&&
+		is_array( $block_lab_attributes )
+		&&
+		( isset( $block_lab_config->fields[ $name ] ) || 'className' === $name )
+	);
+
+	/**
+	 * Filters whether the $name argument to this function is allowed.
+	 *
+	 * By default, this only allows a $name that is in the block fields or the 'className'.
+	 * This filter can prevent returning null from this function
+	 * when looking for another value in the block attributes.
+	 *
+	 * @param bool   $is_name_allowed Whether the name is allowed.
+	 * @param string $name The name of value to get.
+	 */
+	$is_block_field_name_allowed = apply_filters( 'is_block_field_name_allowed', $is_name_allowed, $name );
+
+	if ( ! $is_block_field_name_allowed ) {
 		return null;
 	}
 
